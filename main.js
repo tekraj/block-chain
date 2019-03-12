@@ -1,10 +1,18 @@
 import BlockChain from './src/block-chain';
 import Transaction from './src/transaction';
+const EC = require("elliptic").ec;
+const ec = EC('secp256k1');
+
+import {privateKey,publicKey} from './src/keys';
+const myKey = ec.keyFromPrivate(privateKey);
+const myWalletAddress = myKey.getPublic('hex');
+
 let myCoin = new BlockChain();
 
-myCoin.createTransaction(new Transaction('address1','address2',100));
-myCoin.createTransaction(new Transaction('address2','address1',50));
-myCoin.minePendingTransactions('my-address');
- console.log('My Balance',myCoin.getBalanceOfAddress('my-address'));
- myCoin.minePendingTransactions('my-address');
- console.log('My Balance',myCoin.getBalanceOfAddress('my-address'));
+const tx1 = new Transaction(myWalletAddress,publicKey,10);
+tx1.signTransaction(myKey);
+myCoin.createTransaction(tx1);
+console.log('Mining');
+myCoin.minePendingTransactions(myWalletAddress);
+console.log(myCoin.getBalanceOfAddress(myWalletAddress));
+

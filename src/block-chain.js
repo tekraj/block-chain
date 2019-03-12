@@ -23,10 +23,13 @@ class BlockChain{
         this.chain.push(newBlock);
     }
 
-    isBlockChainValid(){
+    isChainValid(){
         for(let i=1;i<this.chain.length;i++){
             const currentBlock = this.chain[i];
             const previousBlock = this.chain[i-1];
+            if(!currentBlock.hasValidTransaction()){
+                return false;
+            }
             if(currentBlock.hash!==currentBlock.calculateHash()){
                 console.log(currentBlock.calculateHash());
                 return false;
@@ -51,6 +54,13 @@ class BlockChain{
     }
 
     createTransaction(transaction){
+        if(!transaction.fromAddress || !transaction.toAddress){
+            throw new Error('Transaction must include to and from address');
+        }
+
+        if(!transaction.isValid()){
+            throw new Error('Can not add invalid transaction to chain');
+        }
         this.pendingTransactions.push(transaction);
     }
 
